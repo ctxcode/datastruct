@@ -43,8 +43,15 @@ if ($orderStruct->validate($order, $errors)) {
     var_dump($errors);
 }
 
+
 ```
 
+Or more simple ones, like
+
+```php
+$emailStruct = Ds::string()->format('email');
+if($emailStruct->validate('test@example.com')){ ... }
+```
 
 ## Shortcut class
 
@@ -56,7 +63,18 @@ To make coding easier, you can create this class to type just Ds instead of Data
 class Ds extends \DataStruct\Ds {}
 ```
 
-## Formats
+## Field types
+
+```
+Object: For key value
+Array
+Integer
+Float
+String
+Boolean
+```
+
+## String Formats
 
 Todo
 
