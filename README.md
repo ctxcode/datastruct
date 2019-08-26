@@ -10,7 +10,7 @@ composer require ctxkiwi/datastruct
 
 ## Basic usage
 
-```
+```php
 $orderStruct = Ds::object([
     'id' => Ds::integer()->min(1),
     'user' => Ds::object([
