@@ -1,5 +1,5 @@
 
-# DataStruct
+# DataStruct (WIP)
 
 DataStruct is a package to validate and/or autocorrect the data given.
 
