@@ -1,0 +1,25 @@
+{
+    "name": "ctxkiwi/datastruct",
+    "description": "DataStruct is a package to validate and/or autocorrect the data given.",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Lorenz Vandevelde",
+            "email": "vdvlorenz@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "VuePre\\": "src"
+        }
+    },
+    "require": {
+        "php": ">=7.0.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^5.4.0|^6.0",
+        "symfony/var-dumper": "^4.1"
+    },
+    "scripts": {
+    }
+}
