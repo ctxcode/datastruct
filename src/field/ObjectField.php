@@ -6,9 +6,7 @@ class ObjectField extends \DataStruct\Field implements \DataStruct\FieldInterfac
 
     protected $type = 'object';
 
-    private $interfaces = [];
-    private $usesInterface = null;
-    private $usesFields = null;
+    private $_optional = [];
     public $fields = [];
 
     public function __construct(Array $fields) {
@@ -24,12 +22,19 @@ class ObjectField extends \DataStruct\Field implements \DataStruct\FieldInterfac
     }
 
     public function getField($fn) {
-        return $this->fields[$fn] ?? null;
+        if (!isset($this->fields[$fn])) {
+            throw new \Exception('Unknown field: ' . $fn);
+        }
+        return $this->fields[$fn];
     }
 
     public function validate($data, &$errors = []): bool {
 
-        if ($this->_nullable && $data === null) {
+        if (!is_array($errors)) {
+            $errors = [];
+        }
+
+        if ($this->isNullable() && $data === null) {
             return true;
         }
 
@@ -40,12 +45,15 @@ class ObjectField extends \DataStruct\Field implements \DataStruct\FieldInterfac
 
         $countErrors = count($errors);
 
-        $fieldnames = $this->usesFields ? $this->usesFields : array_keys($this->fields);
+        $fieldnames = array_keys($this->fields);
 
         foreach ($fieldnames as $fn) {
             $field = $this->fields[$fn];
             $newErrors = [];
-            if (!isset($data->$fn)) {
+            if (!property_exists($data, $fn)) {
+                if (in_array($fn, $this->_optional, true)) {
+                    continue;
+                }
                 $newErrors[] = ['error' => 'missing-field', 'message' => 'Missing field'];
             } else {
                 $field->validate($data->$fn, $newErrors);
@@ -69,23 +77,16 @@ class ObjectField extends \DataStruct\Field implements \DataStruct\FieldInterfac
         }
 
         if (!is_object($data)) {
-            if ($this->_defaultValue !== null) {
-                return clone ($this->_defaultValue);
-            }
-
-            if ($this->_nullable) {
-                return null;
-            }
+            return $this->getDefault();
         }
 
-        $result = (object) [];
-
-        if (!is_object($data)) {
-            $data = (object) [];
-        }
+        $result = json_decode(json_encode($data));
 
         foreach ($this->fields as $fn => $field) {
-            if (!isset($data->$fn)) {
+            if (!property_exists($data, $fn)) {
+                if (in_array($fn, $this->_optional, true)) {
+                    continue;
+                }
                 $data->$fn = null;
             }
             $result->$fn = $field->fixData($data->$fn);
@@ -94,22 +95,19 @@ class ObjectField extends \DataStruct\Field implements \DataStruct\FieldInterfac
         return $result;
     }
 
-    public function getDefault() {
-        if ($this->_defaultValue !== null) {
-            return clone ($this->_defaultValue);
-        }
-
-        if ($this->_nullable) {
-            return null;
+    public function getDefault($depth = 0) {
+        if ($this->hasDefault()) {
+            return json_decode($this->getDefault());
         }
 
         $result = (object) [];
         foreach ($this->fields as $fn => $field) {
             try {
-                $result->$fn = $field->getDefault();
+                $result->$fn = $field->getDefault($depth + 1);
             } catch (\Exception $e) {
                 $f = $fn . (isset($e->field) ? '.' . $e->field : '');
-                $ex = new \Exception('Field "' . $f . '" : ' . $e->getMessage());
+                $errorMessagePrefix = $depth === 0 ? ('Field "' . $f . '" : ') : '';
+                $ex = new \Exception($errorMessagePrefix . $e->getMessage());
                 $ex->field = $f;
                 throw $ex;
             }
@@ -127,41 +125,36 @@ class ObjectField extends \DataStruct\Field implements \DataStruct\FieldInterfac
         return $result;
     }
 
-    public function addInterface($name, Array $fields) {
-        $this->validateInterfaceFields($fields);
-        $this->interfaces[$name] = $fields;
-
+    public function allRequired() {
+        $this->_optional = [];
         return $this;
     }
 
-    private function validateInterfaceFields(Array $fields) {
+    public function allOptional() {
+        $this->_optional = array_keys($this->fields);
+        return $this;
+    }
+
+    public function required(Array $fields) {
+        $fields = array_unique($fields);
+        $this->fieldsExistCheck($fields, 'required() -> ');
+        $this->_optional = array_values(array_diff($this->_optional, $fields));
+        return $this;
+    }
+
+    public function optional(Array $fields) {
+        $this->fieldsExistCheck($fields, 'optional() -> ');
+        $this->_optional = array_unique(array_merge($this->_optional, $fields));
+        return $this;
+    }
+
+    private function fieldsExistCheck(Array $fields, $errorPrefix = '') {
         foreach ($fields as $field) {
-            if (!is_string($field)) {
-                throw new \Exception('Interface fields must be an array of strings only');
-            }
             if (!isset($this->fields[$field])) {
-                throw new \Exception('Unknown field: ' . $field);
+                $this->error(new \Exception($errorPrefix . 'Unknown field "' . $field . '"'));
             }
         }
-    }
-
-    public function useInterface($name) {
-        if (!isset($this->interfaces[$name])) {
-            throw new \Exception('Unknown interface: ' . $name);
-        }
-
-        $this->usesInterface = $name;
-        $this->usesFields = $this->interfaces[$name];
-
-        return $this;
-    }
-
-    public function only(Array $fields) {
-        $this->validateInterfaceFields($fields);
-        $this->usesInterface = null;
-        $this->usesFields = $fields;
-
-        return $this;
+        return true;
     }
 
 }

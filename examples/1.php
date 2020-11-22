@@ -1,5 +1,9 @@
 <?php
 
+include __DIR__ . '/../vendor/autoload.php';
+
+use \DataStruct\Ds;
+
 Ds::registerFormat('email', function ($string) {
     // ...
     return true;
@@ -17,15 +21,16 @@ $userDs = Ds::object([
     'name' => Ds::string()->min(2)->max(24)->nullable(),
 ]);
 
-$user = [
+$user = (object) [
     'id' => 123,
     'email' => 'test@validate.com',
     'password' => 'mypass123',
     'name' => 'Johny',
 ];
 
-if ($userDs->validate($user)) {
+if ($userDs->validate($user, $errors)) {
     echo 'Success :)';
 } else {
     echo 'Failed :(';
+    var_dump($errors);
 }

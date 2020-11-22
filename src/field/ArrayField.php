@@ -7,6 +7,8 @@ class ArrayField extends \DataStruct\Field implements \DataStruct\FieldInterface
     protected $type = 'array';
 
     private $_struct = null;
+    private $_min = null;
+    private $_max = null;
 
     public function __construct(\DataStruct\FieldInterface $struct) {
         $this->_struct = $struct;
@@ -16,13 +18,13 @@ class ArrayField extends \DataStruct\Field implements \DataStruct\FieldInterface
         return $this->_struct;
     }
 
-    public function getField($fn) {
-        return $this->_struct->getField($fn);
-    }
-
     public function validate($data, &$errors = []): bool {
 
-        if ($this->_nullable && $data === null) {
+        if (!is_array($errors)) {
+            $errors = [];
+        }
+
+        if ($this->isNullable() && $data === null) {
             return true;
         }
 
@@ -56,13 +58,9 @@ class ArrayField extends \DataStruct\Field implements \DataStruct\FieldInterface
         return true;
     }
 
-    public function getDefault() {
-        if ($this->_defaultValue !== null) {
-            return $this->_defaultValue;
-        }
-
-        if ($this->_nullable) {
-            return null;
+    public function getDefault($depth = 0) {
+        if ($this->hasDefault()) {
+            return $this->getDefault();
         }
 
         return [];
@@ -81,11 +79,8 @@ class ArrayField extends \DataStruct\Field implements \DataStruct\FieldInterface
             return $result;
         }
 
-        if ($this->_defaultValue !== null) {
-            return $this->_defaultValue;
-        }
-        if ($this->_nullable) {
-            return null;
+        if ($this->hasDefault()) {
+            return $this->getDefault();
         }
 
         return [];
@@ -98,6 +93,16 @@ class ArrayField extends \DataStruct\Field implements \DataStruct\FieldInterface
             $result[] = $this->_struct->getExample();
         }
         return $result;
+    }
+
+    public function min(int $count) {
+        $this->_min = $count;
+        return $this;
+    }
+
+    public function max(int $count) {
+        $this->_max = $count;
+        return $this;
     }
 
 }

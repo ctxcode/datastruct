@@ -10,7 +10,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "VuePre\\": "src"
+            "DataStruct\\": "src"
         }
     },
     "require": {

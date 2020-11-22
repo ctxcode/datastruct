@@ -29,6 +29,6 @@ class Ds {
     }
 
     public static function registerFormat(...$options) {
-        return \DataStruct\Field\String::registerFormat(...$options);
+        return \DataStruct\Field\StringField::registerFormat(...$options);
     }
 }

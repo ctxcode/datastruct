@@ -11,7 +11,11 @@ class IntegerField extends \DataStruct\Field implements \DataStruct\FieldInterfa
 
     public function validate($data, &$errors = []): bool {
 
-        if ($this->_nullable && $data === null) {
+        if (!is_array($errors)) {
+            $errors = [];
+        }
+
+        if ($this->isNullable() && $data === null) {
             return true;
         }
 
@@ -36,14 +40,8 @@ class IntegerField extends \DataStruct\Field implements \DataStruct\FieldInterfa
         if ($this->validate($data)) {
             return $data;
         }
-        if ($this->_defaultValue !== null) {
-            return $this->_defaultValue;
-        }
-        if ($this->_nullable) {
-            return null;
-        }
 
-        return 0;
+        return $this->getDefault();
     }
 
     public function getExample() {
@@ -52,10 +50,12 @@ class IntegerField extends \DataStruct\Field implements \DataStruct\FieldInterfa
 
     public function min(int $min) {
         $this->_min = $min;
+        return $this;
     }
 
     public function max(int $max) {
         $this->_max = $max;
+        return $this;
     }
 
 }

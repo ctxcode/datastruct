@@ -11,11 +11,15 @@ class FloatField extends \DataStruct\Field implements \DataStruct\FieldInterface
 
     public function validate($data, &$errors = []): bool {
 
-        if ($this->_nullable && $data === null) {
+        if (!is_array($errors)) {
+            $errors = [];
+        }
+
+        if ($this->isNullable() && $data === null) {
             return true;
         }
 
-        if (!is_double($data)) {
+        if (!is_double($data) && !is_integer($data)) {
             $errors[] = ['error' => 'incorrect-type', 'message' => 'Incorrect data type'];
             return false;
         }
@@ -36,26 +40,22 @@ class FloatField extends \DataStruct\Field implements \DataStruct\FieldInterface
         if ($this->validate($data)) {
             return $data;
         }
-        if ($this->_defaultValue !== null) {
-            return $this->_defaultValue;
-        }
-        if ($this->_nullable) {
-            return null;
-        }
 
-        return 0;
+        return $this->getDefault();
     }
 
     public function getExample() {
         return 123.45;
     }
 
-    public function min(double $min) {
+    public function min(float $min) {
         $this->_min = $min;
+        return $this;
     }
 
-    public function max(double $max) {
+    public function max(float $max) {
         $this->_max = $max;
+        return $this;
     }
 
 }
