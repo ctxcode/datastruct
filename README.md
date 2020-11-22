@@ -35,7 +35,6 @@ $order = [
     'created_at' => date('Y-m-d') . ' 12:00:00',
 ];
 
-$errors = [];
 if ($orderStruct->validate($order, $errors)) {
     echo 'Success :)';
 } else {
