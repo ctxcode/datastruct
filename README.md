@@ -60,7 +60,15 @@ To make coding easier, you can create this class to type just Ds instead of Data
 ```php
 <?php
 
-class Ds extends \DataStruct\Ds {}
+class Ds extends \DataStruct\Ds {
+    
+    // You can also add some shortcut types here
+    // Like:
+    public static function color(){
+        return static::string()->matchRegex('/^#[0-9A-F]{6}$/'); // e.g. #FF00CC
+    }
+
+}
 ```
 
 ## Field types
