@@ -73,12 +73,12 @@ class Ds extends \DataStruct\Ds {
 ## Field types
 
 ```
-Object: For key value
-Array
-Integer
-Float
-String
-Boolean
+Ds::object: Key => Value
+Ds::array: Array<T> (so no keys)
+Ds::integer
+Ds::float
+Ds::string
+Ds::boolean
 ```
 
 ## String Formats

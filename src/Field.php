@@ -79,4 +79,8 @@ abstract class Field {
         throw new \Exception($prefix . $msg, 0, $ex);
     }
 
+    public function getType() {
+        return $this->type;
+    }
+
 }

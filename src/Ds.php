@@ -4,8 +4,8 @@ namespace DataStruct;
 
 class Ds {
 
-    public static function string(...$options) {
-        return new \DataStruct\Field\StringField(...$options);
+    public static function string() {
+        return new \DataStruct\Field\StringField();
     }
 
     public static function object(...$options) {
@@ -16,16 +16,16 @@ class Ds {
         return new \DataStruct\Field\ArrayField(...$options);
     }
 
-    public static function integer(...$options) {
-        return new \DataStruct\Field\IntegerField(...$options);
+    public static function integer() {
+        return new \DataStruct\Field\IntegerField();
     }
 
-    public static function float(...$options) {
-        return new \DataStruct\Field\FloatField(...$options);
+    public static function float() {
+        return new \DataStruct\Field\FloatField();
     }
 
-    public static function boolean(...$options) {
-        return new \DataStruct\Field\BooleanField(...$options);
+    public static function boolean() {
+        return new \DataStruct\Field\BooleanField();
     }
 
     public static function registerFormat(...$options) {

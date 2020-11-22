@@ -51,6 +51,14 @@ class StringField extends \DataStruct\Field implements \DataStruct\FieldInterfac
             return false;
         }
 
+        foreach ($this->_useCustomFormats as $format) {
+            $error = ['error' => 'custom-format', 'message' => 'Invalid format', 'format-name' => $format];
+            if (!static::$_customFormats[$format]($data, $error)) {
+                $errors[] = $error;
+                return false;
+            }
+        }
+
         return true;
     }
 
@@ -106,6 +114,9 @@ class StringField extends \DataStruct\Field implements \DataStruct\FieldInterfac
     public static function registerFormat($name, $func) {
         if (isset(static::$_customFormats[$name])) {
             throw new \Exception('Custom format "' . $name . '" already exists');
+        }
+        if (!preg_match('/^[a-z]+$/', $name)) {
+            throw new \Exception('Custom format names may only contain lowercase characters [a-z], received: "' . $name . '"');
         }
         static::$_customFormats[$name] = $func;
     }
